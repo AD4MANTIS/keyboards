@@ -1,3 +1,11 @@
+# now with german qwertz support
+
+I added support for the german keys with the qwertz layout.
+Here is an example layout i got:
+![example german layout](resources/example.png)
+
+original readme:
+
 # keyboards
 
 Supporting simulated annealing code for the [Why I Made The World's Worst Keyboard](https://youtu.be/188fipF-i5I) YouTube video.

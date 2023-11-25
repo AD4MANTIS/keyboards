@@ -15,7 +15,7 @@ seed = 123456
 const rng = StableRNGs.LehmerRNG(seed)
 
 # ~~~ data ~~~
-bookPath = "meinBuch.txt"
+bookPath = "resources/meinBuch.txt"
 temperature = 500
 epoch = 20
 coolingRate = 0.99
