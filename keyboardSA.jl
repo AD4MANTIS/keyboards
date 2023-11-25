@@ -15,7 +15,11 @@ seed = 123456
 const rng = StableRNGs.LehmerRNG(seed)
 
 # ~~~ data ~~~
-bookPath = "myBook.txt"
+bookPath = "meinBuch.txt"
+temperature = 500
+epoch = 20
+coolingRate = 0.99
+num_iterations = 1000
 
 # ~~~ weights ~~~
 const distanceEffort = 1 # at 2 distance penalty is squared
@@ -147,7 +151,9 @@ traditionalLayoutMap = Dict{Int,Tuple{Float64,Float64,Int,Int,Int}}(
     10 => (9.5, 4.5, 1, 7, 0),
     11 => (10.5, 4.5, 1, 8, 0),
     12 => (11.5, 4.5, 1, 8, 0),
-    13 => (12.5, 4.5, 1, 8, 0), 14 => (2, 3.5, 2, 1, 0),
+    13 => (12.5, 4.5, 1, 8, 0),
+
+    14 => (2, 3.5, 2, 1, 0),
     15 => (3, 3.5, 2, 2, 0),
     16 => (4, 3.5, 2, 3, 0),
     17 => (5, 3.5, 2, 4, 0),
@@ -158,7 +164,9 @@ traditionalLayoutMap = Dict{Int,Tuple{Float64,Float64,Int,Int,Int}}(
     22 => (10, 3.5, 2, 7, 0),
     23 => (11, 3.5, 2, 8, 0),
     24 => (12, 3.5, 2, 8, 0),
-    25 => (13, 3.5, 2, 8, 0), 26 => (2.25, 2.5, 3, 1, 1),
+    25 => (13, 3.5, 2, 8, 0),
+    
+    26 => (2.25, 2.5, 3, 1, 1),
     27 => (3.25, 2.5, 3, 2, 1),
     28 => (4.25, 2.5, 3, 3, 1),
     29 => (5.25, 2.5, 3, 4, 1),
@@ -168,7 +176,9 @@ traditionalLayoutMap = Dict{Int,Tuple{Float64,Float64,Int,Int,Int}}(
     33 => (9.25, 2.5, 3, 6, 1),
     34 => (10.25, 2.5, 3, 7, 1),
     35 => (11.25, 2.5, 3, 8, 1),
-    36 => (12.25, 2.5, 3, 8, 0), 37 => (2.75, 1.5, 4, 1, 0),
+    36 => (12.25, 2.5, 3, 8, 0),
+    
+    37 => (2.75, 1.5, 4, 1, 0),
     38 => (3.75, 1.5, 4, 2, 0),
     39 => (4.75, 1.5, 4, 3, 0),
     40 => (5.75, 1.5, 4, 4, 0),
@@ -180,8 +190,71 @@ traditionalLayoutMap = Dict{Int,Tuple{Float64,Float64,Int,Int,Int}}(
     46 => (11.75, 1.5, 4, 8, 0),
 )
 
+# traditional QWERTZ (x, y, row, finger, home)
+traditionalQWERTZLayoutMap = Dict{Int,Tuple{Float64,Float64,Int,Int,Int}}(
+    1 => (0.5, 4.5, 1, 1, 0),
+    2 => (1.5, 4.5, 1, 1, 0),
+    3 => (2.5, 4.5, 1, 1, 0),
+    4 => (3.5, 4.5, 1, 2, 0),
+    5 => (4.5, 4.5, 1, 3, 0),
+    6 => (5.5, 4.5, 1, 4, 0),
+    7 => (6.5, 4.5, 1, 4, 0),
+    8 => (7.5, 4.5, 1, 5, 0),
+    9 => (8.5, 4.5, 1, 6, 0),
+    10 => (9.5, 4.5, 1, 7, 0),
+    11 => (10.5, 4.5, 1, 8, 0),
+    12 => (11.5, 4.5, 1, 8, 0),
+    13 => (12.5, 4.5, 1, 8, 0),
+
+    14 => (2, 3.5, 2, 1, 0),
+    15 => (3, 3.5, 2, 2, 0),
+    16 => (4, 3.5, 2, 3, 0),
+    17 => (5, 3.5, 2, 4, 0),
+    18 => (6, 3.5, 2, 4, 0),
+    19 => (7, 3.5, 2, 5, 0),
+    20 => (8, 3.5, 2, 5, 0),
+    21 => (9, 3.5, 2, 6, 0),
+    22 => (10, 3.5, 2, 7, 0),
+    23 => (11, 3.5, 2, 8, 0),
+    24 => (12, 3.5, 2, 8, 0),
+    25 => (13, 3.5, 2, 8, 0),
+    
+    26 => (2.25, 2.5, 3, 1, 1),
+    27 => (3.25, 2.5, 3, 2, 1),
+    28 => (4.25, 2.5, 3, 3, 1),
+    29 => (5.25, 2.5, 3, 4, 1),
+    30 => (6.25, 2.5, 3, 4, 0),
+    31 => (7.25, 2.5, 3, 5, 0),
+    32 => (8.25, 2.5, 3, 5, 1),
+    33 => (9.25, 2.5, 3, 6, 1),
+    34 => (10.25, 2.5, 3, 7, 1),
+    35 => (11.25, 2.5, 3, 8, 1),
+    36 => (12.25, 2.5, 3, 8, 0),
+    37 => (13.25, 2.5, 3, 8, 0),
+    
+    38 => (1.75, 1.5, 4, 1, 0),
+    39 => (2.75, 1.5, 4, 1, 0),
+    40 => (3.75, 1.5, 4, 2, 0),
+    41 => (4.75, 1.5, 4, 3, 0),
+    42 => (5.75, 1.5, 4, 4, 0),
+    43 => (6.75, 1.5, 4, 4, 0),
+    44 => (7.75, 1.5, 4, 5, 0),
+    45 => (8.75, 1.5, 4, 5, 0),
+    46 => (9.75, 1.5, 4, 6, 0),
+    47 => (10.75, 1.5, 4, 7, 0),
+    48 => (11.75, 1.5, 4, 8, 0),
+)
+
+useLayoutMap = traditionalQWERTZLayoutMap
+
+
+const layoutKeyCountQWERTY = 46
+const layoutKeyCountQWERTZ = 48
+
+const layoutKeyCount = layoutKeyCountQWERTZ
 
 # comparisons
+# inital index defines the starting key a charecter will be placed on
 QWERTYgenome = [
     '~',
     '1',
@@ -229,6 +302,57 @@ QWERTYgenome = [
     '<',
     '>',
     '?'
+]
+
+QWERTZgenome = [
+    '^',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '0',
+    'ß',
+    '´',
+    'Q',
+    'W',
+    'E',
+    'R',
+    'T',
+    'Z',
+    'U',
+    'I',
+    'O',
+    'P',
+    'Ü',
+    '+',
+    'A',
+    'S',
+    'D',
+    'F',
+    'G',
+    'H',
+    'J',
+    'K',
+    'L',
+    'Ö',
+    'Ä',
+    '#',
+    '<',
+    'Y',
+    'X',
+    'C',
+    'V',
+    'B',
+    'N',
+    'M',
+    ',',
+    '.',
+    '-'
 ]
 
 ABCgenome = [
@@ -329,8 +453,10 @@ DVORAKgenome = [
     'Z'
 ]
 
+useGenome = QWERTZgenome
+
 # alphabet
-const letterList = [
+const letterListQWERTY = [
     'A',
     'B',
     'C',
@@ -379,8 +505,61 @@ const letterList = [
     '?'
 ]
 
-# map dictionary
-const keyMapDict = Dict(
+const letterListQWERTZ = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '^',
+    'ß',
+    '´',
+    'Ü',
+    'Ö',
+    'Ä',
+    '+',
+    '#',
+    '<',
+    ',',
+    '.',
+    '-',
+]
+
+const letterList = letterListQWERTZ;
+
+# map dictionary (key, shift)
+const keyMapDictQWERTY = Dict(
     'a' => [1, 0], 'A' => [1, 1],
     'b' => [2, 0], 'B' => [2, 1],
     'c' => [3, 0], 'C' => [3, 1],
@@ -429,6 +608,59 @@ const keyMapDict = Dict(
     '/' => [46, 0], '?' => [46, 1]
 )
 
+const keyMapDictQWERTZ = Dict(
+    'a' => [1, 0], 'A' => [1, 1],
+    'b' => [2, 0], 'B' => [2, 1],
+    'c' => [3, 0], 'C' => [3, 1],
+    'd' => [4, 0], 'D' => [4, 1],
+    'e' => [5, 0], 'E' => [5, 1],
+    'f' => [6, 0], 'F' => [6, 1],
+    'g' => [7, 0], 'G' => [7, 1],
+    'h' => [8, 0], 'H' => [8, 1],
+    'i' => [9, 0], 'I' => [9, 1],
+    'j' => [10, 0], 'J' => [10, 1],
+    'k' => [11, 0], 'K' => [11, 1],
+    'l' => [12, 0], 'L' => [12, 1],
+    'm' => [13, 0], 'M' => [13, 1],
+    'n' => [14, 0], 'N' => [14, 1],
+    'o' => [15, 0], 'O' => [15, 1],
+    'p' => [16, 0], 'P' => [16, 1],
+    'q' => [17, 0], 'Q' => [17, 1],
+    'r' => [18, 0], 'R' => [18, 1],
+    's' => [19, 0], 'S' => [19, 1],
+    't' => [20, 0], 'T' => [20, 1],
+    'u' => [21, 0], 'U' => [21, 1],
+    'v' => [22, 0], 'V' => [22, 1],
+    'w' => [23, 0], 'W' => [23, 1],
+    'x' => [24, 0], 'X' => [24, 1],
+    'y' => [25, 0], 'Y' => [25, 1],
+    'z' => [26, 0], 'Z' => [26, 1],
+    '0' => [27, 0], '=' => [27, 1],
+    '1' => [28, 0], '!' => [28, 1],
+    '2' => [29, 0], '"' => [29, 1],
+    '3' => [30, 0], '§' => [30, 1],
+    '4' => [31, 0], '$' => [31, 1],
+    '5' => [32, 0], '%' => [32, 1],
+    '6' => [33, 0], '&' => [33, 1],
+    '7' => [34, 0], '/' => [34, 1],
+    '8' => [35, 0], '(' => [35, 1],
+    '9' => [36, 0], ')' => [36, 1],
+    '^' => [37, 0], '°' => [37, 1],
+    'ß' => [38, 0], '?' => [38, 1],
+    '´' => [39, 0], '`' => [39, 1],
+    'ü' => [40, 0], 'Ü' => [40, 1],
+    'ö' => [41, 0], 'Ö' => [41, 1],
+    'ä' => [42, 0], 'Ä' => [42, 1],
+    '+' => [43, 0], '*' => [43, 1],
+    '#' => [44, 0], ''' => [44, 1],
+    '<' => [45, 0], '>' => [45, 1],
+    ',' => [46, 0], ';' => [46, 1],
+    '.' => [47, 0], ':' => [47, 1],
+    '-' => [48, 0], '_' => [48, 1]
+)
+
+const keyMapDict = keyMapDictQWERTZ
+
 const handList = [1, 1, 1, 1, 2, 2, 2, 2] # what finger is with which hand
 
 # ### KEYBOARD FUNCTIONS ###
@@ -444,7 +676,7 @@ function drawKeyboard(myGenome, id, currentLayoutMap)
     plot()
     namedColours = ["yellow", "blue", "green", "orange", "pink", "green", "blue", "yellow"]
 
-    for i in 1:46
+    for i in 1:layoutKeyCount
         letter = myGenome[i]
         x, y, row, finger, home = currentLayoutMap[i]
         # myColour = namedColours[finger]
@@ -602,7 +834,7 @@ function objectiveFunction(file, myGenome, currentLayoutMap)
     # ~ create hand ~
     myFingerList = zeros(8, 6) # (homeX, homeY, currentX, currentY, distanceCounter, objectiveCounter)
 
-    for i in 1:46
+    for i in 1:layoutKeyCount
         x, y, _, finger, home = currentLayoutMap[i]
 
         if home == 1.0
@@ -627,7 +859,7 @@ function objectiveFunction(file, myGenome, currentLayoutMap)
 
     # calculate objective
     objective = sum(myFingerList[:, 6])
-    objective = (objective / QWERTYscore - 1) * 100
+    objective = (objective / layoutScore - 1) * 100
 
     # return
     return objective
@@ -640,7 +872,7 @@ function baselineObjectiveFunction(file, myGenome, currentLayoutMap) # same as p
     # ~ create hand ~
     myFingerList = zeros(8, 6) # (homeX, homeY, currentX, currentY, distanceCounter, objectiveCounter)
 
-    for i in 1:46
+    for i in 1:layoutKeyCount
         x, y, _, finger, home = currentLayoutMap[i]
 
         if home == 1.0
@@ -673,10 +905,10 @@ end
 # ### SA OPTIMISER ###
 function shuffleGenome(currentGenome, temperature)
     # setup
-    noSwitches = Int(maximum([2, minimum([floor(temperature / 100), 46])]))
+    noSwitches = Int(maximum([2, minimum([floor(temperature / 100), layoutKeyCount])]))
 
     # positions of switched letterList
-    switchedPositions = randperm(rng, 46)[1:noSwitches]
+    switchedPositions = randperm(rng, layoutKeyCount)[1:noSwitches]
     newPositions = shuffle(rng, copy(switchedPositions))
 
     # create new genome by shuffeling
@@ -695,12 +927,12 @@ end
 
 
 function runSA(
-    layoutMap=traditionalLayoutMap;
-    baselineLayout=QWERTYgenome,
-    temperature=500,
-    epoch=20,
-    coolingRate=0.99,
-    num_iterations=25000,
+    layoutMap,
+    baselineLayout,
+    temperature,
+    epoch,
+    coolingRate,
+    num_iterations,
     save_current_best=:plot,
     verbose=true,
 )
@@ -710,8 +942,8 @@ function runSA(
     verbose && println("Running code...")
     # baseline
     verbose && print("Calculating raw baseline: ")
-    global QWERTYscore = baselineObjectiveFunction(file, baselineLayout, currentLayoutMap) # yes its a global, fight me
-    verbose && println(QWERTYscore)
+    global layoutScore = baselineObjectiveFunction(file, baselineLayout, currentLayoutMap) # yes its a global, fight me
+    verbose && println(layoutScore)
 
     verbose && println("From here everything is reletive with + % worse and - % better than this baseline \n
         Note that best layout is being saved as a png at each step. Kill program when satisfied.")
@@ -807,4 +1039,11 @@ end
 
 # ### RUN ###
 Random.seed!(rng, seed)
-@time runSA()
+@time runSA(
+    useLayoutMap,
+    useGenome,
+    temperature,
+    epoch,
+    coolingRate,
+    num_iterations
+)
