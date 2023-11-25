@@ -1,6 +1,6 @@
 # now with german qwertz support
 
-I added support for the german keys with the qwertz layout.
+I added support for the german keys with the QWERTZ layout.
 Here is an example layout i got:
 ![example german layout](resources/example.png)
 
@@ -12,14 +12,15 @@ Supporting simulated annealing code for the [Why I Made The World's Worst Keyboa
 
 Written in Julia... because it's fast, easy to read, and annoys my labmates.
 
-To run, clone the this repository and start Julia with `julia
---project=.` and run `include("keyboardSA.jl")`. It should start by
-benchmarking your training data (myBook.txt) against QWERTY followed by building
-it's own optimal layout. Change the number of iterations and cooling rates as
-desired within the SA() function. The terminal will give some indication of
-current progres (also stored by a new text file will give a
-iteration-by-iteration record of progress), and .png files of the current best
-solution will be saved to your same directory.
+To run, clone the this repository and start Julia with
+`julia --project=.` and run `include("keyboardSA.jl")`.
+It should start by benchmarking your training data (myBook.txt)
+against QWERTY followed by building it's own optimal layout.
+Change the number of iterations and cooling rates as
+desired within the `data` block at the beginning of the file.
+The terminal will give some indication of current progress
+(also stored by a new text file will give a iteration-by-iteration record of progress),
+and .png files of the current best solution will be saved to your same directory.
 
 To train on your own custom dataset either point the "myBook.txt" somewhere else or just replace its contents.
 
