@@ -19,7 +19,7 @@ bookPath = "resources/meinBuch.txt"
 temperature = 500
 epoch = 20
 coolingRate = 0.99
-num_iterations = 1000
+num_iterations = 25000
 
 # ~~~ weights ~~~
 const distanceEffort = 1 # at 2 distance penalty is squared

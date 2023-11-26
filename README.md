@@ -1,4 +1,22 @@
-# now with german qwertz support
+# keyboards
+
+## rewritten in Rust
+
+Comparison:
+```
+temperature = 500
+epoch = 20
+coolingRate = 0.99
+num_iterations = 25000
+```
+
+Julia:
+> 62.265114 seconds (26.52 M allocations: 1.370 GiB, 0.35% gc time, 1.85% compilation time: 3% of which was recompilation)
+
+Rust:
+> Duration: Duration: PT42.719515S
+
+## now with german qwertz support
 
 I added support for the german keys with the QWERTZ layout.
 Here is an example layout i got:
@@ -6,7 +24,6 @@ Here is an example layout i got:
 
 original readme:
 
-# keyboards
 
 Supporting simulated annealing code for the [Why I Made The World's Worst Keyboard](https://youtu.be/188fipF-i5I) YouTube video.
 
