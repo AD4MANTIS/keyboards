@@ -2,20 +2,19 @@ pub mod draw;
 pub mod models;
 pub mod setup;
 
+use models::finger_list::get_finger_list;
 use models::finger_list::FingerList;
 use models::layout_map::Layout;
 use models::Hand;
 use once_cell::sync::Lazy;
 use rand::prelude::*;
-use rayon::prelude::*;
 use setup::DISTANCE_EFFORT;
 use setup::DOUBLE_FINGER_EFFORT;
 use setup::DOUBLE_HAND_EFFORT;
 use setup::KEY_MAP_DICT;
-use std::collections::HashMap;
 use std::fs::File;
 use std::fs::OpenOptions;
-use std::io::{BufRead, BufReader, Read, Write};
+use std::io::{Read, Write};
 use std::path::Path;
 
 use crate::draw::draw_keyboard;
@@ -78,21 +77,6 @@ fn create_genome<const N: usize>(letter_list: &mut [char; N], rng: &mut impl Rng
     *letter_list
 }
 
-fn count_characters(book_path: &str) -> HashMap<char, usize> {
-    let mut char_count: HashMap<char, usize> = HashMap::new();
-    let file = File::open(book_path).unwrap();
-    let reader = BufReader::new(file);
-
-    for line in reader.lines() {
-        for c in line.unwrap().chars() {
-            let c = c.to_ascii_uppercase();
-            *char_count.entry(c).or_insert(0) += 1;
-        }
-    }
-
-    char_count
-}
-
 // ### SAVE SCORE ###
 fn append_to_file(path: &str, update_line: &str) {
     if !Path::new(path).exists() {
@@ -122,7 +106,7 @@ fn do_keypress<const N: usize>(
     my_finger_list: &mut FingerList,
     my_genome: &[char; N],
     key_press: usize,
-    old_finger: &mut i32,
+    old_finger: &mut usize,
     old_hand: &mut Option<Hand>,
     layout_map: &[Layout; N],
     letter_list: &[char; N],
@@ -130,73 +114,60 @@ fn do_keypress<const N: usize>(
     let named_key = letter_list[key_press];
     let actual_key = my_genome.iter().position(|&x| x == named_key).unwrap();
 
-    let Layout {
-        x,
-        y,
-        row,
-        hand,
-        finger,
-        home: _,
-    } = layout_map[actual_key];
-    let current_hand = hand;
+    let layout = &layout_map[actual_key];
+    let current_hand = layout.hand;
+    let layout_finger_id = layout.get_finger_id();
 
-    for finger_id in 0..8 {
-        let (home_x, home_y, current_x, current_y, distance_counter, objective_counter) = (
-            my_finger_list[finger_id][0],
-            my_finger_list[finger_id][1],
-            my_finger_list[finger_id][2],
-            my_finger_list[finger_id][3],
-            my_finger_list[finger_id][4],
-            my_finger_list[finger_id][5],
-        );
-
-        if finger_id == finger as usize {
-            let distance = (x - current_x).abs() + (y - current_y).abs();
-            let distance_penalty = distance.powi(DISTANCE_EFFORT);
-            let new_distance = distance_counter + distance;
-
-            let double_finger_penalty =
-                if finger as i32 != *old_finger && *old_finger != 0 && distance != 0. {
-                    DOUBLE_FINGER_EFFORT
-                } else {
-                    0
-                };
-            *old_finger = finger as i32;
-
-            let double_hand_penalty =
-                if Some(current_hand) != *old_hand && *old_hand != Some(Hand::Left) {
-                    DOUBLE_HAND_EFFORT
-                } else {
-                    0
-                };
-            *old_hand = Some(current_hand);
-
-            let finger_penalty = FINGER_EFFORT[finger_id];
-            let row_penalty = ROW_EFFORT[row as usize];
-
-            let penalties = [
-                distance_penalty,
-                double_finger_penalty as f64,
-                double_hand_penalty as f64,
-                finger_penalty,
-                row_penalty,
-            ];
-            let penalty = penalties
-                .iter()
-                .zip(EFFORT_WEIGHTING.iter())
-                .map(|(x, y)| x * (*y))
-                .sum::<f64>();
-            let new_objective = objective_counter + penalty;
-
-            my_finger_list[finger_id][2] = x;
-            my_finger_list[finger_id][3] = y;
-            my_finger_list[finger_id][4] = new_distance;
-            my_finger_list[finger_id][5] = new_objective;
-        } else {
-            my_finger_list[finger_id][2] = home_x;
-            my_finger_list[finger_id][3] = home_y;
-        }
+    for finger_id in (0..8).filter(|x| *x != layout_finger_id) {
+        let my_finger = &mut my_finger_list[finger_id];
+        my_finger.current_y = my_finger.home_y;
+        my_finger.current_x = my_finger.home_x;
     }
+
+    let finger_id = layout_finger_id;
+    let my_finger = &mut my_finger_list[finger_id];
+
+    let distance =
+        (layout.x.abs_diff(my_finger.current_x) + layout.y.abs_diff(my_finger.current_y)) as i32;
+    let distance_penalty = distance.pow(DISTANCE_EFFORT);
+    let new_distance = my_finger.distance_counter + distance;
+
+    let double_finger_penalty = if finger_id != *old_finger && *old_finger != 0 && distance != 0 {
+        DOUBLE_FINGER_EFFORT
+    } else {
+        0
+    };
+
+    *old_finger = finger_id;
+
+    let double_hand_penalty = if Some(current_hand) != *old_hand && *old_hand != Some(Hand::Left) {
+        DOUBLE_HAND_EFFORT
+    } else {
+        0
+    };
+    *old_hand = Some(current_hand);
+
+    let finger_penalty = FINGER_EFFORT[finger_id];
+    let row_penalty = ROW_EFFORT[layout.row as usize];
+
+    let penalties = [
+        distance_penalty as f64,
+        double_finger_penalty as f64,
+        double_hand_penalty as f64,
+        finger_penalty,
+        row_penalty,
+    ];
+    let penalty = penalties
+        .iter()
+        .zip(EFFORT_WEIGHTING.iter())
+        .map(|(x, y)| x * (*y))
+        .sum::<f64>();
+    let new_objective = my_finger.objective_counter + penalty;
+
+    my_finger.current_x = layout.x;
+    my_finger.current_y = layout.y;
+    my_finger.distance_counter = new_distance;
+    my_finger.objective_counter = new_objective;
 }
 
 /// Calculate the objective function for a given file, genome, and layout map
@@ -208,24 +179,20 @@ fn objective_function<const N: usize>(
     letter_list: &[char; N],
 ) -> f64 {
     // create hand
-    let mut my_finger_list: FingerList = [[0.0; 6]; 8]; // (homeX, homeY, currentX, currentY, distanceCounter, objectiveCounter)
+    let mut my_finger_list: FingerList = get_finger_list();
 
-    for &Layout {
-        x,
-        y,
-        row: _,
-        hand: _,
-        finger,
-        home,
-    } in layout_map
-    {
-        if home {
-            my_finger_list[finger as usize][0..4].copy_from_slice(&[x, y, x, y]);
+    for layout in layout_map {
+        if layout.home {
+            let my_finger = &mut my_finger_list[layout.get_finger_id()];
+            my_finger.home_x = layout.x;
+            my_finger.home_y = layout.y;
+            my_finger.current_x = layout.x;
+            my_finger.current_y = layout.y;
         }
     }
 
     // load text
-    let mut old_finger = 0;
+    let mut old_finger: usize = 0;
     let mut old_hand: Option<Hand> = None;
 
     for current_character in file.chars() {
@@ -247,7 +214,10 @@ fn objective_function<const N: usize>(
     }
 
     // calculate objective
-    let mut objective = my_finger_list.iter().map(|finger| finger[5]).sum::<f64>();
+    let mut objective = my_finger_list
+        .iter()
+        .map(|finger| finger.objective_counter)
+        .sum::<f64>();
 
     if let Some(layout_score) = layout_score {
         objective = (objective / layout_score - 1.0) * 100.0;
@@ -383,18 +353,21 @@ pub fn run_sa<const N: usize>(
                 best_genome = new_genome;
                 best_objective = new_objective;
 
-                println!("(new best, png being saved)");
                 match save_current_best {
                     SaveOption::Graphics => {
+                        println!("(new best, png being saved)");
                         draw_keyboard(&best_genome, iteration.to_string().as_str(), layout_map);
                     }
                     SaveOption::Text => {
+                        println!("(new best)");
                         append_to_file(
                             "results/bestGenomes.txt",
                             &format!("{iteration}: {best_genome:#?}\n"),
                         );
                     }
-                    SaveOption::None => {}
+                    SaveOption::None => {
+                        println!("(new best)");
+                    }
                 }
             }
         } else if (-delta / temperature).exp() > rand::random() {

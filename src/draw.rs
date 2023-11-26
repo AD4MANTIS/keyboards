@@ -41,8 +41,8 @@ pub(crate) fn draw_keyboard<const N: usize>(
 
         if layout.home {
             plt.draw_rect(
-                ((layout.x * 100.) as i32, (layout.y * 100.) as i32),
-                ((layout.x * 100.) as i32, (layout.y * 100.) as i32),
+                (layout.x as i32, layout.y as i32),
+                (layout.x as i32, layout.y as i32),
                 &plotters::style::ShapeStyle {
                     color: my_colour.to_rgba(),
                     filled: true,
@@ -54,14 +54,8 @@ pub(crate) fn draw_keyboard<const N: usize>(
         }
 
         plt.draw_rect(
-            (
-                ((layout.x - 0.45) * 100.) as i32,
-                ((layout.y - 0.45) * 100.) as i32,
-            ),
-            (
-                ((layout.x + 0.45) * 100.) as i32,
-                ((layout.y + 0.45) * 100.) as i32,
-            ),
+            ((layout.x - 45) as i32, (layout.y - 45) as i32),
+            ((layout.x + 45) as i32, (layout.y + 45) as i32),
             &plotters::style::ShapeStyle {
                 color: my_colour,
                 filled: true,
@@ -81,7 +75,7 @@ pub(crate) fn draw_keyboard<const N: usize>(
                     rgb: (255, 255, 255),
                 },
             },
-            ((layout.x * 100.) as i32, (layout.y * 100.) as i32),
+            (layout.x as i32, layout.y as i32),
         )
         .unwrap();
     }
