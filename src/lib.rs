@@ -389,7 +389,7 @@ pub fn run_sa<const N: usize>(
                     }
                     SaveOption::Text => {
                         append_to_file(
-                            "resources/bestGenomes.txt",
+                            "results/bestGenomes.txt",
                             &format!("{iteration}: {best_genome:#?}\n"),
                         );
                     }

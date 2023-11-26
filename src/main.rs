@@ -7,7 +7,6 @@ use keyboards::{
     setup::{COOLING_RATE, EPOCH, NUM_ITERATIONS, TEMPERATURE},
     SaveOption,
 };
-use rand::prelude::*;
 
 fn main() {
     let start_time = Utc::now().time();
@@ -21,7 +20,7 @@ fn main() {
         COOLING_RATE,
         NUM_ITERATIONS,
         // drawing the png files in Debug mode can be slow without optimizations
-        SaveOption::Graphics,
+        SaveOption::Text,
     );
 
     let end_time = Utc::now().time();
