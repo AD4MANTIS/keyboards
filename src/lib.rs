@@ -12,6 +12,7 @@ use setup::DISTANCE_EFFORT;
 use setup::DOUBLE_FINGER_EFFORT;
 use setup::DOUBLE_HAND_EFFORT;
 use setup::KEY_MAP_DICT;
+use std::collections::BTreeMap;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::{Read, Write};
@@ -104,7 +105,7 @@ fn determine_keypress(current_character: char) -> Option<usize> {
 
 fn do_keypress<const N: usize>(
     my_finger_list: &mut FingerList,
-    my_genome: &[char; N],
+    my_genome: &BTreeMap<char, usize>,
     key_press: usize,
     old_finger: &mut usize,
     old_hand: &mut Option<Hand>,
@@ -112,9 +113,9 @@ fn do_keypress<const N: usize>(
     letter_list: &[char; N],
 ) {
     let named_key = letter_list[key_press];
-    let actual_key = my_genome.iter().position(|&x| x == named_key).unwrap();
+    let actual_key = my_genome.get(&named_key).unwrap();
 
-    let layout = &layout_map[actual_key];
+    let layout = &layout_map[*actual_key];
     let current_hand = layout.hand;
     let layout_finger_id = layout.get_finger_id();
 
@@ -195,22 +196,19 @@ fn objective_function<const N: usize>(
     let mut old_finger: usize = 0;
     let mut old_hand: Option<Hand> = None;
 
-    for current_character in file.chars() {
-        // determine keypress
-        let key_press = determine_keypress(current_character);
+    let genome_key_map =
+        BTreeMap::<char, usize>::from_iter(my_genome.iter().enumerate().map(|x| (*x.1, x.0)));
 
-        // do keypress
-        if let Some(kp) = key_press {
-            do_keypress(
-                &mut my_finger_list,
-                my_genome,
-                kp,
-                &mut old_finger,
-                &mut old_hand,
-                layout_map,
-                letter_list,
-            );
-        }
+    for key_press in file.chars().filter_map(determine_keypress) {
+        do_keypress(
+            &mut my_finger_list,
+            &genome_key_map,
+            key_press,
+            &mut old_finger,
+            &mut old_hand,
+            layout_map,
+            letter_list,
+        );
     }
 
     // calculate objective

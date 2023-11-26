@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 // map dictionary (key, shift)
-pub type KeyMapDict = HashMap<char, (usize, bool)>;
+pub type KeyMapDict = BTreeMap<char, (usize, bool)>;
 
 #[allow(dead_code)]
 pub fn get_key_map_dict_qwerty() -> KeyMapDict {

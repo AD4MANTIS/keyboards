@@ -15,7 +15,7 @@ Julia:
 > 62.265114 seconds (26.52 M allocations: 1.370 GiB, 0.35% gc time, 1.85% compilation time: 3% of which was recompilation)
 
 Rust:
-> Duration: PT42.719515S
+> Duration: PT39.007007S
 
 ## now with german qwertz support
 

@@ -20,7 +20,7 @@ fn main() {
         COOLING_RATE,
         NUM_ITERATIONS,
         // drawing the png files in Debug mode can be slow without optimizations
-        SaveOption::None,
+        SaveOption::Text,
     );
 
     let end_time = Utc::now().time();

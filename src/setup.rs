@@ -10,7 +10,7 @@ pub const BOOK_PATH: &str = "resources/meinBuch.txt";
 pub const TEMPERATURE: f64 = 500.0;
 pub const EPOCH: f64 = 20.0;
 pub const COOLING_RATE: f64 = 0.99;
-pub const NUM_ITERATIONS: usize = 5000;
+pub const NUM_ITERATIONS: usize = 25000;
 
 pub static KEY_MAP_DICT: Lazy<KeyMapDict> = Lazy::new(get_key_map_dict_qwertz);
 
