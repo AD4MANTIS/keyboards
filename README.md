@@ -3,7 +3,8 @@
 ## rewritten in Rust
 
 Comparison:
-```
+
+``` julia
 temperature = 500
 epoch = 20
 coolingRate = 0.99
@@ -14,7 +15,7 @@ Julia:
 > 62.265114 seconds (26.52 M allocations: 1.370 GiB, 0.35% gc time, 1.85% compilation time: 3% of which was recompilation)
 
 Rust:
-> Duration: Duration: PT42.719515S
+> Duration: PT42.719515S
 
 ## now with german qwertz support
 

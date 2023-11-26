@@ -1,5 +1,5 @@
 // comparisons
-// inital index defines the starting key a charecter will be placed on
+// initial index defines the starting key a character will be placed on
 
 #[allow(dead_code)]
 pub const QWERTY_GENOME: [char; 46] = [

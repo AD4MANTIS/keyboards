@@ -151,7 +151,7 @@ fn do_keypress<const N: usize>(
         );
 
         if finger_id == finger as usize {
-            let distance = (x - current_x).powi(2) + (y - current_y).powi(2);
+            let distance = (x - current_x).abs() + (y - current_y).abs();
             let distance_penalty = distance.powi(DISTANCE_EFFORT);
             let new_distance = distance_counter + distance;
 
@@ -318,6 +318,7 @@ pub fn run_sa<const N: usize>(
     let mut file_content = String::new();
     file.read_to_string(&mut file_content)
         .expect("Unable to read file");
+    let file_content = file_content;
 
     println!("Calculating raw baseline: ");
     // baseline
