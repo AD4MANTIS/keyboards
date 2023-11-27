@@ -12,7 +12,9 @@ pub(crate) fn draw_keyboard<const N: usize>(
     layout_map: &[Layout; N],
 ) {
     let file_name = format!("results/{}.png", id);
-    let mut plt = BitMapBackend::new(&file_name, (1400, 600));
+
+    const IMG_HEIGHT: i32 = 600;
+    let mut plt = BitMapBackend::new(&file_name, (1400, IMG_HEIGHT as u32));
     // plt.into_drawing_area().fill(&plotters::style::RGBColor(255, 255, 255)).unwrap();
 
     // const NAMED_COLOURS: [&str; 8] = [
@@ -21,6 +23,10 @@ pub(crate) fn draw_keyboard<const N: usize>(
 
     for i in 0..N {
         let layout = &layout_map[i];
+
+        let x = layout.x;
+        let y = IMG_HEIGHT - layout.y;
+
         let letter = my_genome[i];
         let mut my_colour = RGBColor(176, 176, 176);
         // myColour = NAMED_COLOURS[finger]
@@ -41,8 +47,8 @@ pub(crate) fn draw_keyboard<const N: usize>(
 
         if layout.home {
             plt.draw_rect(
-                (layout.x as i32, layout.y as i32),
-                (layout.x as i32, layout.y as i32),
+                (x, y),
+                (x, y),
                 &plotters::style::ShapeStyle {
                     color: my_colour.to_rgba(),
                     filled: true,
@@ -54,8 +60,8 @@ pub(crate) fn draw_keyboard<const N: usize>(
         }
 
         plt.draw_rect(
-            ((layout.x - 45) as i32, (layout.y - 45) as i32),
-            ((layout.x + 45) as i32, (layout.y + 45) as i32),
+            (x - 45, y - 45),
+            (x + 45, y + 45),
             &plotters::style::ShapeStyle {
                 color: my_colour,
                 filled: true,
@@ -75,7 +81,7 @@ pub(crate) fn draw_keyboard<const N: usize>(
                     rgb: (255, 255, 255),
                 },
             },
-            (layout.x as i32, layout.y as i32),
+            (x, y),
         )
         .unwrap();
     }
