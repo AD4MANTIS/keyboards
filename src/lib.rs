@@ -11,7 +11,7 @@ use rand::prelude::*;
 use setup::DISTANCE_EFFORT;
 use setup::DOUBLE_FINGER_EFFORT;
 use setup::DOUBLE_HAND_EFFORT;
-use setup::KEY_MAP_DICT;
+use setup::GET_KEY_FN;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -100,7 +100,7 @@ fn append_updates(update_line: &str) {
 // ### OBJECTIVE FUNCTIONS ###
 fn determine_keypress(current_character: char) -> Option<usize> {
     // proceed if valid key (e.g. we don't care about spaces now)
-    KEY_MAP_DICT.get(&current_character).map(|(kp, _)| *kp - 1)
+    GET_KEY_FN(current_character).map(|(kp, _)| kp - 1)
 }
 
 fn do_keypress<const N: usize>(

@@ -1,7 +1,3 @@
-use once_cell::sync::Lazy;
-
-use crate::models::key_maps::{get_key_map_dict_qwertz, KeyMapDict};
-
 // rng
 pub const SEED: u64 = 123456;
 
@@ -12,7 +8,7 @@ pub const EPOCH: f64 = 20.0;
 pub const COOLING_RATE: f64 = 0.99;
 pub const NUM_ITERATIONS: usize = 25000;
 
-pub static KEY_MAP_DICT: Lazy<KeyMapDict> = Lazy::new(get_key_map_dict_qwertz);
+pub use crate::models::key_maps::get_key_qwertz as GET_KEY_FN;
 
 // weights
 pub const DISTANCE_EFFORT: u32 = 1; // at 2 distance penalty is squared
