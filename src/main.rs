@@ -1,26 +1,30 @@
 // #![feature(test)]
 
 use chrono::Utc;
-use keyboards::{
-    models::{genome, layout_map, letter_list},
-    run_sa,
-    setup::{COOLING_RATE, EPOCH, NUM_ITERATIONS, TEMPERATURE},
-    SaveOption,
-};
+use keyboards::prelude::*;
 
 fn main() {
     let start_time = Utc::now().time();
 
-    let result = run_sa(
-        &layout_map::get_traditional_qwertz_layout_map(),
-        &genome::QWERTZ_GENOME,
-        &letter_list::LETTER_LIST_QWERTZ,
-        TEMPERATURE,
-        EPOCH,
-        COOLING_RATE,
-        NUM_ITERATIONS,
-        // drawing the png files in Debug mode can be slow without optimizations
-        SaveOption::Text,
+    let training_set_path = "resources/meinBuch.txt";
+
+    let file_content = std::fs::read_to_string(training_set_path).expect("Unable to open file");
+
+    // Select your layout with the first generic parameter.
+    // The second ist the number of keys and must match the Layout, otherwise you will get a compiler error.
+    let result = run_sa::<QwertyEnUs, 46>(
+        &file_content,
+        SaSetup {
+            temperature: 500.,
+            epoch: 20.,
+            cooling_rate: 0.99,
+            num_iterations: 25000,
+        },
+        LoggingOptions {
+            text: true,
+            image: SaveImageOption::FirstAndLast,
+            verbosity: Verbosity::Normal,
+        },
     );
 
     let end_time = Utc::now().time();
@@ -39,7 +43,7 @@ fn main() {
 //     use super::*;
 
 //     #[bench]
-//     fn bench_add_two(b: &mut Bencher) {
+//     fn bench_run_sa(b: &mut Bencher) {
 //         b.iter(|| main());
 //     }
 // }

@@ -1,9 +1,27 @@
+use super::{
+    layout::{QwertyEnUs, QwertzDeDe},
+    Finger, Hand,
+};
+
+pub trait GetLayoutMap<const N: usize> {
+    fn get_layout_map() -> [KeyboardKey; N];
+}
+
+impl GetLayoutMap<46> for QwertyEnUs {
+    fn get_layout_map() -> [KeyboardKey; 46] {
+        get_traditional_layout_map()
+    }
+}
+
+impl GetLayoutMap<48> for QwertzDeDe {
+    fn get_layout_map() -> [KeyboardKey; 48] {
+        get_traditional_qwertz_layout_map()
+    }
+}
+
 // ~~~ keyboard ~~~
-
-use super::{Finger, Hand};
-
 #[derive(Debug, Clone, Copy)]
-pub enum KeyboardRow {
+pub(crate) enum KeyboardRow {
     Number = 0,
     TopLetter,
     MiddleLetter,
@@ -11,16 +29,16 @@ pub enum KeyboardRow {
 }
 
 #[derive(Debug)]
-pub struct Layout {
-    pub x: i32,
-    pub y: i32,
-    pub row: KeyboardRow,
-    pub hand: Hand,
-    pub finger: Finger,
-    pub home: bool,
+pub struct KeyboardKey {
+    pub(crate) x: i32,
+    pub(crate) y: i32,
+    pub(crate) row: KeyboardRow,
+    pub(crate) hand: Hand,
+    pub(crate) finger: Finger,
+    pub(crate) home: bool,
 }
 
-impl Layout {
+impl KeyboardKey {
     pub fn get_finger_id(&self) -> usize {
         (self.finger as usize)
             + match self.hand {
@@ -32,7 +50,7 @@ impl Layout {
 
 type RawLayout = (i32, i32, i32, i32, bool);
 
-impl From<RawLayout> for Layout {
+impl From<RawLayout> for KeyboardKey {
     fn from(value: RawLayout) -> Self {
         Self {
             x: value.0,
@@ -60,28 +78,16 @@ impl From<RawLayout> for Layout {
     }
 }
 
-// pub type LayoutMap = HashMap<usize, Layout>;
-
-// fn into_layout_map(value: &[RawLayout]) -> LayoutMap {
-//     value
-//         .iter()
-//         .map(|x| Layout::from(*x))
-//         .into_iter()
-//         .enumerate()
-//         .collect()
-// }
-
-fn into_layout_map<const N: usize>(value: [RawLayout; N]) -> [Layout; N] {
+fn into_layout_map<const N: usize>(value: [RawLayout; N]) -> [KeyboardKey; N] {
     value
         .into_iter()
-        .map(Layout::from)
+        .map(KeyboardKey::from)
         .collect::<Vec<_>>()
         .try_into()
         .unwrap()
 }
 
-#[allow(dead_code)]
-pub fn get_traditional_layout_map() -> [Layout; 46] {
+fn get_traditional_layout_map() -> [KeyboardKey; 46] {
     into_layout_map([
         (50, 450, 1, 1, false),
         (150, 450, 1, 1, false),
@@ -132,8 +138,7 @@ pub fn get_traditional_layout_map() -> [Layout; 46] {
     ])
 }
 
-#[allow(dead_code)]
-pub fn get_traditional_qwertz_layout_map() -> [Layout; 48] {
+fn get_traditional_qwertz_layout_map() -> [KeyboardKey; 48] {
     into_layout_map([
         (50, 450, 1, 1, false),
         (150, 450, 1, 1, false),

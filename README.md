@@ -2,7 +2,17 @@
 
 ## rewritten in Rust
 
-Comparison:
+I think i introduced a bug somewhere that produces bad results. It worked with a previous commit.
+
+Configure the main parameters directly in the [main.rs](src/main.rs) file.
+Select your layout with the first generic parameter.
+The second ist the number of keys and must match the Layout, otherwise you will get a compiler error.
+
+To adjust the training set update the `training_set_path` in [main.rs](src/main.rs).
+
+Advanced setup can be found in the [advanced_setup.rs](src/advanced_setup.rs) file.
+
+### Comparison
 
 ``` julia
 temperature = 500
@@ -11,11 +21,16 @@ coolingRate = 0.99
 num_iterations = 25000
 ```
 
-Julia:
+#### julia
+
 > 62.265114 seconds (26.52 M allocations: 1.370 GiB, 0.35% gc time, 1.85% compilation time: 3% of which was recompilation)
 
-Rust:
+#### Rust
+
 > Duration: PT27.854251S
+
+With even more optimizations in the implementation:
+> Duration: PT19.896563S
 
 ## now with german qwertz support
 
@@ -24,7 +39,6 @@ Here is an example layout i got:
 ![example german layout](resources/example.png)
 
 original readme:
-
 
 Supporting simulated annealing code for the [Why I Made The World's Worst Keyboard](https://youtu.be/188fipF-i5I) YouTube video.
 

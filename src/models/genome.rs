@@ -1,5 +1,60 @@
+use rand::{seq::SliceRandom, RngCore};
+
+use super::layout::{QwertyEnUs, QwertzDeDe};
+
+pub(crate) fn create_genome<const N: usize>(
+    letter_list: &mut [char; N],
+    rng: &mut impl RngCore,
+) -> [char; N] {
+    letter_list.shuffle(rng);
+    *letter_list
+}
+
+// SA OPTIMIZER
+pub(crate) fn shuffle_genome<const N: usize>(
+    current_genome: &[char; N],
+    temperature: f64,
+    rng: &mut impl RngCore,
+) -> [char; N] {
+    // setup
+    let no_switches = (temperature / 100.0).floor().min(N as f64).max(2.0) as usize;
+
+    // positions of switched letterList
+    let mut switched_positions: Vec<usize> = (0..N).collect();
+    switched_positions.shuffle(rng);
+    let switched_positions = &switched_positions[0..no_switches];
+
+    let mut new_positions = switched_positions.to_vec();
+    new_positions.shuffle(rng);
+
+    // create new genome by shuffling
+    let mut new_genome = *current_genome;
+    for i in 0..no_switches {
+        let og = switched_positions[i];
+        let ne = new_positions[i];
+        new_genome[og] = current_genome[ne];
+    }
+
+    new_genome
+}
+
 // comparisons
 // initial index defines the starting key a character will be placed on
+pub trait GetGenome<const N: usize> {
+    fn get_genome() -> &'static [char; N];
+}
+
+impl GetGenome<46> for QwertyEnUs {
+    fn get_genome() -> &'static [char; 46] {
+        &QWERTY_GENOME
+    }
+}
+
+impl GetGenome<48> for QwertzDeDe {
+    fn get_genome() -> &'static [char; 48] {
+        &QWERTZ_GENOME
+    }
+}
 
 #[allow(dead_code)]
 pub const QWERTY_GENOME: [char; 46] = [

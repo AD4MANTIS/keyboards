@@ -1,7 +1,23 @@
-// map dictionary (key, shift)
+use super::layout::{QwertyEnUs, QwertzDeDe};
 
-#[allow(dead_code)]
-pub fn get_key_qwerty(c: char) -> Option<(usize, bool)> {
+pub trait GetKeyMap {
+    fn get_key_map(c: char) -> Option<(usize, bool)>;
+}
+
+// map dictionary (key, shift)
+impl GetKeyMap for QwertyEnUs {
+    fn get_key_map(c: char) -> Option<(usize, bool)> {
+        get_key_qwerty(c)
+    }
+}
+
+impl GetKeyMap for QwertzDeDe {
+    fn get_key_map(c: char) -> Option<(usize, bool)> {
+        get_key_qwertz(c)
+    }
+}
+
+fn get_key_qwerty(c: char) -> Option<(usize, bool)> {
     let key = match c {
         'a' => (1, false),
         'A' => (1, true),
@@ -104,7 +120,7 @@ pub fn get_key_qwerty(c: char) -> Option<(usize, bool)> {
     }
 }
 
-pub fn get_key_qwertz(c: char) -> Option<(usize, bool)> {
+fn get_key_qwertz(c: char) -> Option<(usize, bool)> {
     let key = match c {
         'a' => (1, false),
         'A' => (1, true),

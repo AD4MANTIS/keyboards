@@ -1,17 +1,18 @@
-pub mod finger_list;
-pub mod genome;
-pub mod key_maps;
-pub mod layout_map;
-pub mod letter_list;
+pub(crate) mod finger_list;
+pub(crate) mod genome;
+pub(crate) mod key_maps;
+pub mod layout;
+pub(crate) mod layout_map;
+pub(crate) mod letter_list;
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-pub enum Hand {
+pub(crate) enum Hand {
     Left,
     Right,
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum Finger {
+pub(crate) enum Finger {
     Ring = 0,
     Middle,
     Index,
